@@ -2,9 +2,19 @@ package com.pavels.house;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiInfo;
+import android.content.Intent;
+import java.lang.Math;
+import java.net.IDN;
 
 // TODO:
 // Remove top panel
@@ -31,43 +41,64 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        new java.util.Random();
+
     }
 
+    //if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals (action)){
+        /*NetworkInfo netInfo = Intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+        if (ConnectivityManager.TYPE_WIFI == netInfo.getType()) {
+            WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            WifiInfo info = wifiManager.getConnectionInfo();
+            String ssid = info.getSSID();
+        }*/
+    //}*/
+    public void ShowMenu(View view)
+    {
+
+    }
     public void onClick(View view)
     {
-        Change_Network_Status(view, 1);
-    }
 
-    public void Change_Network_Status(View view, int ID){
-        ImageView No_Connection = (ImageView) findViewById(R.id.No_Connection);
+        ImageView no_connection = (ImageView) findViewById(R.id.No_Connection);
         ImageView unsecure = (ImageView) findViewById(R.id.Unsecure);
-        ImageView WIFI = (ImageView) findViewById(R.id.WIFI);
-        ImageView VPN = (ImageView) findViewById(R.id.VPN);
-        switch(ID){
-            case 1:
-                WIFI.setVisibility(View.VISIBLE);
-                VPN.setVisibility(View.GONE);
-                unsecure.setVisibility(View.GONE);
-                No_Connection.setVisibility(View.GONE);
-            case 2:
-                WIFI.setVisibility(View.GONE);
-                unsecure.setVisibility(View.GONE);
-                VPN.setVisibility(View.VISIBLE);
-                No_Connection.setVisibility(View.GONE);
-            case 3:
-                VPN.setVisibility(View.GONE);
-                unsecure.setVisibility(View.VISIBLE);
-                WIFI.setVisibility(View.GONE);
-                No_Connection.setVisibility(View.GONE);
-            default:
-                WIFI.setVisibility(View.GONE);
-                VPN.setVisibility(View.GONE);
-                unsecure.setVisibility(View.GONE);
-                No_Connection.setVisibility(View.VISIBLE);
-        }
+        ImageView wifi = (ImageView) findViewById(R.id.WIFI);
+        ImageView vpn = (ImageView) findViewById(R.id.VPN);
 
+        int ID = (int)(Math.random() * 4);
+        Log.d("Random", String.valueOf(ID));
+
+        switch((int)ID) {
+            case 1:
+                wifi.setVisibility(View.VISIBLE);
+                vpn.setVisibility(View.GONE);
+                unsecure.setVisibility(View.GONE);
+                no_connection.setVisibility(View.GONE);
+                break;
+            case 2:
+                wifi.setVisibility(View.GONE);
+                unsecure.setVisibility(View.GONE);
+                vpn.setVisibility(View.VISIBLE);
+                no_connection.setVisibility(View.GONE);
+                break;
+            case 3:
+                vpn.setVisibility(View.GONE);
+                unsecure.setVisibility(View.VISIBLE);
+                wifi.setVisibility(View.GONE);
+                no_connection.setVisibility(View.GONE);
+                break;
+            default:
+                wifi.setVisibility(View.GONE);
+                vpn.setVisibility(View.GONE);
+                unsecure.setVisibility(View.GONE);
+                no_connection.setVisibility(View.VISIBLE);
+                break;
+        }
     }
+
+
 }
 
