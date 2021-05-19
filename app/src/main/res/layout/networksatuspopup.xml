@@ -5,7 +5,8 @@
     android:layout_width="200dp"
     android:layout_height="475dp"
     android:padding="5dp"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/txtclose"
@@ -19,28 +20,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="5dp"
-        tools:layout_editor_absoluteY="5dp">
+    <ImageView
+        android:id="@+id/ConnectionIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_baseline_wifi_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtclose" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="15dp"
-            android:src="@drawable/ic_baseline_wifi_24" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="5dp"
-            android:text="WIFI connection"
-            android:textColor="@color/black" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/ConnectionName"
+        android:layout_width="106dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:text="WIFI connection"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/ConnectionIcon"
+        app:layout_constraintStart_toEndOf="@+id/ConnectionIcon"
+        app:layout_constraintTop_toTopOf="@+id/ConnectionIcon" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
