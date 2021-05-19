@@ -2,10 +2,14 @@ package com.pavels.house;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import android.net.ConnectivityManager;
@@ -13,6 +17,8 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
 import android.content.Intent;
+import android.widget.TextView;
+
 import java.lang.Math;
 import java.net.IDN;
 import java.net.NetworkInterface;
@@ -40,23 +46,16 @@ import java.net.NetworkInterface;
 
 public class MainActivity extends AppCompatActivity {
 
+    Dialog Network_popup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Network_popup = new Dialog(this);
 
     }
-
-    /*if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals (action)){
-        NetworkInfo netInfo = Intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-        if (ConnectivityManager.TYPE_WIFI == netInfo.getType()) {
-            WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-            WifiInfo info = wifiManager.getConnectionInfo();
-            String ssid = info.getSSID();
-        }
-    }*/
-    
 
     public void ShowMenu(View view)
     {
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public void onClick(View view)
+    public void Test_Button(View view)
     {
 
         ImageView no_connection = (ImageView) findViewById(R.id.No_Connection);
@@ -161,6 +160,24 @@ public class MainActivity extends AppCompatActivity {
             mobile.setVisibility(View.GONE);
         }
 
+    }
+
+    public void ShowNetwork(View view)
+    {
+        TextView txtclose;
+        Button btnFollow;
+        Network_popup.setContentView(R.layout.networksatuspopup);
+        txtclose =(TextView) Network_popup.findViewById(R.id.txtclose);
+        txtclose.setText("M");
+        //btnFollow = (Button) Network_popup.findViewById(R.id.btnfollow);
+        txtclose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Network_popup.dismiss();
+            }
+        });
+        Network_popup.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        Network_popup.show();
     }
 }
 

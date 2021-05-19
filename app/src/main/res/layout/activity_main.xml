@@ -10,6 +10,7 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="ShowNetwork"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/connection_background" />
@@ -75,7 +76,7 @@
         android:layout_width="154dp"
         android:layout_height="50dp"
         android:layout_marginTop="136dp"
-        android:onClick="onClick"
+        android:onClick="Test_Button"
         android:text="Test"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
