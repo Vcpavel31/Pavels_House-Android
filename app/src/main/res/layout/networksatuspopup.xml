@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="200dp"
-    android:layout_height="475dp"
+    android:layout_width="225dp"
+    android:layout_height="350dp"
     android:padding="5dp"
     android:layout_gravity="center"
     android:background="@color/white">
@@ -13,12 +13,25 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_gravity="end"
-        android:text="X"
-        android:textColor="@color/black"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/popubackground"
         android:gravity="center"
+        android:text="X"
+        android:textColor="#FF0000"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/ConnectionType"
+        android:layout_width="106dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="12dp"
+        android:text="WIFI type"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/ConnectionIcon"
+        app:layout_constraintStart_toEndOf="@+id/ConnectionIcon"
+        app:layout_constraintTop_toTopOf="@+id/ConnectionIcon" />
 
     <ImageView
         android:id="@+id/ConnectionIcon"
@@ -26,20 +39,128 @@
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:src="@drawable/ic_baseline_wifi_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtclose" />
 
     <TextView
-        android:id="@+id/ConnectionName"
+        android:id="@+id/connectionName"
         android:layout_width="106dp"
         android:layout_height="20dp"
-        android:layout_marginStart="16dp"
-        android:text="WIFI connection"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="WIFI Name"
         android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="@+id/ConnectionIcon"
-        app:layout_constraintStart_toEndOf="@+id/ConnectionIcon"
-        app:layout_constraintTop_toTopOf="@+id/ConnectionIcon" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.489"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ConnectionIcon" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/connectionName"
+        app:srcCompat="@drawable/ic_baseline_wifi_24" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView3"
+        app:layout_constraintStart_toStartOf="@+id/imageView3"
+        app:layout_constraintTop_toBottomOf="@+id/imageView3"
+        app:srcCompat="@drawable/ic_baseline_vpn_lock_24" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView4"
+        app:layout_constraintStart_toStartOf="@+id/imageView4"
+        app:layout_constraintTop_toBottomOf="@+id/imageView4"
+        app:srcCompat="@drawable/ic_baseline_import_export_24" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView5"
+        app:layout_constraintStart_toStartOf="@+id/imageView5"
+        app:layout_constraintTop_toBottomOf="@+id/imageView5"
+        app:srcCompat="@drawable/ic_baseline_cloud_24" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView6"
+        app:layout_constraintStart_toStartOf="@+id/imageView6"
+        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        app:srcCompat="@drawable/ic_baseline_close_24" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Local WIFI"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintTop_toTopOf="@+id/imageView3" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="VPN Connection"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+        app:layout_constraintStart_toEndOf="@+id/imageView4"
+        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Mobile Data"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView5"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toTopOf="@+id/imageView5" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Unsecure Connection"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+        app:layout_constraintStart_toEndOf="@+id/imageView6"
+        app:layout_constraintTop_toTopOf="@+id/imageView6" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="No connection"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView7"
+        app:layout_constraintStart_toEndOf="@+id/imageView7"
+        app:layout_constraintTop_toTopOf="@+id/imageView7" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

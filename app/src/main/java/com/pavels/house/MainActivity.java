@@ -3,11 +3,17 @@ package com.pavels.house;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -62,6 +68,16 @@ public class MainActivity extends AppCompatActivity {
         Network(findViewById(android.R.id.content).getRootView());
         handler.postDelayed(runnable, 30000);
 
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo;
+        wifiInfo = wifiManager.getConnectionInfo();
+
+        //String ssid = "None";
+        /*if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
+            ssid = wifiInfo.getSSID();
+        }*/
+
+        Log.d("SSID", wifiInfo.getSSID());
     }
 
     public void ShowMenu(View view) {
@@ -134,8 +150,16 @@ public class MainActivity extends AppCompatActivity {
         ImageView vpn = (ImageView) findViewById(R.id.VPN);
         ImageView mobile = (ImageView) findViewById(R.id.Mobile);
 
-        if (checkVPN() && SpaceIsConnected()) {
+        if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 1) {
             this.network_state = 2;
+            vpn.setVisibility(View.VISIBLE);
+            unsecure.setVisibility(View.GONE);
+            wifi.setVisibility(View.GONE);
+            no_connection.setVisibility(View.GONE);
+            mobile.setVisibility(View.GONE);
+        }
+        else if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 2) {
+            this.network_state = 6;
             vpn.setVisibility(View.VISIBLE);
             unsecure.setVisibility(View.GONE);
             wifi.setVisibility(View.GONE);
@@ -182,31 +206,46 @@ public class MainActivity extends AppCompatActivity {
         Network(findViewById(android.R.id.content).getRootView());
         TextView txtclose;
         TextView ConnectionName;
+        TextView ConnectionType;
         ImageView ConnectionIcon;
         Network_popup.setContentView(R.layout.networksatuspopup);
         txtclose =(TextView) Network_popup.findViewById(R.id.txtclose);
-        ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionName);
+        ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
+        ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
         ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
+
+        // connectionName
+
         switch(network_state) {
             case 1:
                 ConnectionName.setText("WIFI connection");
+                ConnectionType.setText("WIFI Name");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
                 break;
             case 2:
                 ConnectionName.setText("VPN connection");
+                ConnectionType.setText("Mobile Data");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
             case 3:
                 ConnectionName.setText("Mobile data");
+                ConnectionType.setText("");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
                 break;
             case 4:
                 ConnectionName.setText("Unsecure");
+                ConnectionType.setText("WIFI Name");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
                 break;
             case 5:
                 ConnectionName.setText("No connection");
+                ConnectionType.setText("");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
+                break;
+            case 6:
+                ConnectionName.setText("VPN connection");
+                ConnectionType.setText("WIFI Name");
+                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
         }
 
