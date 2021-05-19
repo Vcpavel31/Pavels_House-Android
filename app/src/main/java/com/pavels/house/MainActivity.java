@@ -15,6 +15,7 @@ import android.net.wifi.WifiInfo;
 import android.content.Intent;
 import java.lang.Math;
 import java.net.IDN;
+import java.net.NetworkInterface;
 
 // TODO:
 // Remove top panel
@@ -44,22 +45,69 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new java.util.Random();
 
     }
 
-    //if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals (action)){
-        /*NetworkInfo netInfo = Intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+    /*if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals (action)){
+        NetworkInfo netInfo = Intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
         if (ConnectivityManager.TYPE_WIFI == netInfo.getType()) {
             WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             WifiInfo info = wifiManager.getConnectionInfo();
             String ssid = info.getSSID();
-        }*/
-    //}*/
+        }
+    }*/
+    
+
     public void ShowMenu(View view)
     {
 
     }
+
+    private int isNetworkConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED) {
+            return 1;
+        }
+        else {
+            if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+                return 2;
+            } else
+                return 3;
+        }
+    }
+
+    public boolean internetIsConnected() {
+        try {
+            String command = "ping -c 1 google.com";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean SpaceIsConnected() {
+        try {
+            String command = "ping -c 1 10.0.0.16";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean O2IsConnected() {
+        try {
+            String command = "ping -c 1 90.177.36.121";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean checkVPN() {
+        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getNetworkInfo(ConnectivityManager.TYPE_VPN).isConnectedOrConnecting();
+    }
+
     public void onClick(View view)
     {
 
@@ -67,11 +115,46 @@ public class MainActivity extends AppCompatActivity {
         ImageView unsecure = (ImageView) findViewById(R.id.Unsecure);
         ImageView wifi = (ImageView) findViewById(R.id.WIFI);
         ImageView vpn = (ImageView) findViewById(R.id.VPN);
+        ImageView mobile = (ImageView) findViewById(R.id.Mobile);
 
-        int ID = (int)(Math.random() * 4);
-        Log.d("Random", String.valueOf(ID));
+        //int ID = (int)(Math.random() * 4);
+        //Log.d("Random", String.valueOf(ID));
+        int connected = 0;
+        int NetworkInterface = isNetworkConnected();
 
-        switch((int)ID) {
+        Log.d("Network - ", String.valueOf(NetworkInterface));
+        Log.d("Space - ", String.valueOf(SpaceIsConnected()));
+        Log.d("O2 - ", String.valueOf(O2IsConnected()));
+        Log.d("Internet - ", String.valueOf(internetIsConnected()));
+
+        if(NetworkInterface == 2) { // WIFI - WIFI or VPN or UNSECURE
+            if (SpaceIsConnected()){ // WIFI or VPN
+                // get wifi connection name
+                if(true) {
+                    // TEST IF NAME OF WIFI IS IN HOME NETWORK
+                    connected = 1; // WIFI
+                }
+                else { // VPN OR UNSECURE
+                    // check if VPN is active
+                    if (checkVPN()) connected = 2; // WIFI or VNP or UNSECURE
+                    else {
+                        if (O2IsConnected()) connected = 3; // WIFI or VPN or UNSECURE
+                        else connected = 4;
+                    }
+                }
+            }
+        }
+        else {
+            if (NetworkInterface == 1){ // MOBILE - UNSECURE
+                if (SpaceIsConnected()) connected = 2; // VPN
+                else {
+                    if (O2IsConnected()) connected = 3; // VPN or UNSECURE
+                    else connected = 4;
+                }
+            }
+            else connected = 4;
+        }
+        switch((int)connected) {
             case 1:
                 wifi.setVisibility(View.VISIBLE);
                 vpn.setVisibility(View.GONE);
