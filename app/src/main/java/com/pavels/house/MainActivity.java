@@ -108,6 +108,14 @@ public class MainActivity extends AppCompatActivity {
         return cm.getNetworkInfo(ConnectivityManager.TYPE_VPN).isConnectedOrConnecting();
     }
 
+    private boolean checkWIFI() {
+        if (isNetworkConnected() == 2){
+            // Get connection's names if they are matching to home, test ping to space
+            return true;
+        }
+        return false;
+    }
+
     public void onClick(View view)
     {
 
@@ -117,71 +125,42 @@ public class MainActivity extends AppCompatActivity {
         ImageView vpn = (ImageView) findViewById(R.id.VPN);
         ImageView mobile = (ImageView) findViewById(R.id.Mobile);
 
-        //int ID = (int)(Math.random() * 4);
-        //Log.d("Random", String.valueOf(ID));
-        int connected = 0;
-        int NetworkInterface = isNetworkConnected();
+        if (checkVPN() && SpaceIsConnected()) {
+            vpn.setVisibility(View.VISIBLE);
+            unsecure.setVisibility(View.GONE);
+            wifi.setVisibility(View.GONE);
+            no_connection.setVisibility(View.GONE);
+            mobile.setVisibility(View.GONE);
+        }
+        else if (checkWIFI() && SpaceIsConnected()) {
+            wifi.setVisibility(View.VISIBLE);
+            vpn.setVisibility(View.GONE);
+            unsecure.setVisibility(View.GONE);
+            no_connection.setVisibility(View.GONE);
+            mobile.setVisibility(View.GONE);
+        }
+        else if (isNetworkConnected() == 1) {
+            wifi.setVisibility(View.GONE);
+            vpn.setVisibility(View.GONE);
+            unsecure.setVisibility(View.GONE);
+            no_connection.setVisibility(View.GONE);
+            mobile.setVisibility(View.VISIBLE);
+        }
+        else if (O2IsConnected()) {
+            wifi.setVisibility(View.GONE);
+            vpn.setVisibility(View.GONE);
+            unsecure.setVisibility(View.VISIBLE);
+            no_connection.setVisibility(View.GONE);
+            mobile.setVisibility(View.GONE);
+        }
+        else{
+            wifi.setVisibility(View.GONE);
+            vpn.setVisibility(View.GONE);
+            unsecure.setVisibility(View.GONE);
+            no_connection.setVisibility(View.VISIBLE);
+            mobile.setVisibility(View.GONE);
+        }
 
-        Log.d("Network - ", String.valueOf(NetworkInterface));
-        Log.d("Space - ", String.valueOf(SpaceIsConnected()));
-        Log.d("O2 - ", String.valueOf(O2IsConnected()));
-        Log.d("Internet - ", String.valueOf(internetIsConnected()));
-
-        if(NetworkInterface == 2) { // WIFI - WIFI or VPN or UNSECURE
-            if (SpaceIsConnected()){ // WIFI or VPN
-                // get wifi connection name
-                if(true) {
-                    // TEST IF NAME OF WIFI IS IN HOME NETWORK
-                    connected = 1; // WIFI
-                }
-                else { // VPN OR UNSECURE
-                    // check if VPN is active
-                    if (checkVPN()) connected = 2; // WIFI or VNP or UNSECURE
-                    else {
-                        if (O2IsConnected()) connected = 3; // WIFI or VPN or UNSECURE
-                        else connected = 4;
-                    }
-                }
-            }
-        }
-        else {
-            if (NetworkInterface == 1){ // MOBILE - UNSECURE
-                if (SpaceIsConnected()) connected = 2; // VPN
-                else {
-                    if (O2IsConnected()) connected = 3; // VPN or UNSECURE
-                    else connected = 4;
-                }
-            }
-            else connected = 4;
-        }
-        switch((int)connected) {
-            case 1:
-                wifi.setVisibility(View.VISIBLE);
-                vpn.setVisibility(View.GONE);
-                unsecure.setVisibility(View.GONE);
-                no_connection.setVisibility(View.GONE);
-                break;
-            case 2:
-                wifi.setVisibility(View.GONE);
-                unsecure.setVisibility(View.GONE);
-                vpn.setVisibility(View.VISIBLE);
-                no_connection.setVisibility(View.GONE);
-                break;
-            case 3:
-                vpn.setVisibility(View.GONE);
-                unsecure.setVisibility(View.VISIBLE);
-                wifi.setVisibility(View.GONE);
-                no_connection.setVisibility(View.GONE);
-                break;
-            default:
-                wifi.setVisibility(View.GONE);
-                vpn.setVisibility(View.GONE);
-                unsecure.setVisibility(View.GONE);
-                no_connection.setVisibility(View.VISIBLE);
-                break;
-        }
     }
-
-
 }
 
