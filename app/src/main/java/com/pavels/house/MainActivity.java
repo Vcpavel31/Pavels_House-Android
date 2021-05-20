@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
 // TODO:
@@ -153,7 +154,57 @@ public class MainActivity extends AppCompatActivity {
     public void TEST(Context context){
 
         String filename = "test.txt";
-        File file = new File(context.getFilesDir(), filename);
+        //File file = new File(context.getFilesDir(), filename);
+
+        try {
+            // catches IOException below
+            final String TESTSTRING = new String("Settings");
+
+            /* We have to use the openFileOutput()-method
+             * the ActivityContext provides, to
+             * protect your file from others and
+             * This is done for security-reasons.
+             * We chose MODE_WORLD_READABLE, because
+             *  we have nothing to hide in our file */
+            //MODE_PRIVATE
+            FileOutputStream fOut = openFileOutput(filename, MODE_PRIVATE);
+            OutputStreamWriter osw = new OutputStreamWriter(fOut);
+
+            // Write the string to the file
+            osw.write(TESTSTRING);
+
+            /* ensure that everything is
+             * really written out and close */
+            osw.flush();
+            osw.close();
+
+//Reading the file back...
+
+            /* We have to use the openFileInput()-method
+             * the ActivityContext provides.
+             * Again for security reasons with
+             * openFileInput(...) */
+
+            FileInputStream fIn = openFileInput(filename);
+            InputStreamReader isr = new InputStreamReader(fIn);
+
+            /* Prepare a char-Array that will
+             * hold the chars we read back in. */
+            char[] inputBuffer = new char[TESTSTRING.length()];
+
+            // Fill the Buffer with data from the file
+            isr.read(inputBuffer);
+
+            // Transform the chars to a String
+            String readString = new String(inputBuffer);
+
+            // Check if we read back the same chars that we had written out
+            boolean isTheSame = TESTSTRING.equals(readString);
+
+            Log.i("File Reading stuff", "success = " + isTheSame);
+
+        } catch (IOException ioe)
+        {ioe.printStackTrace();}
 
         /*String fileContents = "Settings";
         try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
