@@ -16,11 +16,22 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 // TODO:
 // Remove top panel
@@ -47,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
     Dialog Network_popup;
     private Handler handler = new Handler();
+    private Context context;
+
     private int network_state = 0;
 
     private Runnable runnable = new Runnable() {
@@ -67,20 +80,19 @@ public class MainActivity extends AppCompatActivity {
         Network_popup = new Dialog(this);
         Network(findViewById(android.R.id.content).getRootView());
         handler.postDelayed(runnable, 30000);
-
+/*
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo;
         wifiInfo = wifiManager.getConnectionInfo();
-
+*/
         //String ssid = "None";
         /*if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
             ssid = wifiInfo.getSSID();
         }*/
 
-        Log.d("SSID", wifiInfo.getSSID());
-    }
+        //Log.d("SSID", wifiInfo.getSSID());
 
-    public void ShowMenu(View view) {
+        TEST(context);
 
     }
 
@@ -138,8 +150,39 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public void Test_Button(View view){
+    public void TEST(Context context){
 
+        String filename = "test.txt";
+        File file = new File(context.getFilesDir(), filename);
+
+        /*String fileContents = "Settings";
+        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
+            fos.write(Integer.parseInt(fileContents));//.toByteArray()
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        /*
+        FileInputStream fis = context.openFileInput(filename);
+        InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
+        StringBuilder stringBuilder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
+            String line = reader.readLine();
+            while (line != null) {
+                stringBuilder.append(line).append('\n');
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            Log.e("IOException","Error occurred when opening raw file for reading.");
+        } finally {
+            String contents = stringBuilder.toString();
+        }*/
+
+        Spinner dropdown = findViewById(R.id.Home_Tab);
+        String[] items = new String[]{"1", "2", "three"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        dropdown.setAdapter(adapter);
     }
 
     public void Network(View view) {
