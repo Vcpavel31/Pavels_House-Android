@@ -2,6 +2,7 @@ package com.pavels.house;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Application;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+
 import java.nio.charset.StandardCharsets;
 
 // TODO:
@@ -49,11 +51,14 @@ import java.nio.charset.StandardCharsets;
 // 7) Task manager - showing HDO; Printer task; ...
 // 8) Password manager - Probably use OpenSource -> KeePass it has clients for Linux; WIN; PHP; Android
 
-// 1) WIFI SSID: - ICON in design make "visible" one other should be "gone"
-// https://stackoverflow.com/questions/21391395/get-ssid-when-wifi-is-connected > Get SSID
-// Get SSID from MYSQL and check if connected wifi is in local network
-// Is Wireguard tunnel active ???
-// Is here ping to public IP ? > Unsecure if !ping then show No connection
+// 1) WIFI SSID:
+// Get WIFI SSID
+// Compare SSID
+
+// 2) User settings
+// Default screen
+// Default Currency
+// File Accessing
 
 public class MainActivity extends AppCompatActivity {
 
@@ -73,27 +78,19 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Network_popup = new Dialog(this);
-        Network(findViewById(android.R.id.content).getRootView());
-        handler.postDelayed(runnable, 30000);
-/*
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo;
-        wifiInfo = wifiManager.getConnectionInfo();
-*/
-        //String ssid = "None";
-        /*if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
-            ssid = wifiInfo.getSSID();
-        }*/
+        handler.postDelayed(runnable, 0);
 
-        //Log.d("SSID", wifiInfo.getSSID());
-
-        TEST(context);
+        TEST();
+        Drop_Down();
 
     }
 
@@ -142,20 +139,71 @@ public class MainActivity extends AppCompatActivity {
         return cm.getNetworkInfo(ConnectivityManager.TYPE_VPN).isConnectedOrConnecting();
     }
 
-    // TODO
     private boolean checkWIFI() {
         if (isNetworkConnected() == 2){
+            /*
+            WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo;
+            wifiInfo = wifiManager.getConnectionInfo();
+            */
+            //String ssid = "None";
+            /*if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
+                ssid = wifiInfo.getSSID();
+            }*/
+
+            //Log.d("SSID", wifiInfo.getSSID());
             // Get connection's names if they are matching to home, test ping to space
             return true;
         }
         return false;
     }
 
-    public void TEST(Context context){
-
+    public void TEST(){
+        Context context = getApplicationContext();
         String filename = "test.txt";
-        //File file = new File(context.getFilesDir(), filename);
+        //File.createNewFile(filename);
+        /*String FILENAME = "hello_file";
+        String string = "hello world!";
 
+        try {
+            FileOutputStream fos = openFileOutput(FILENAME, MODE_PRIVATE);
+            fos.write(string.getBytes());
+            fos.close();
+        }
+        catch (IOException e) {
+            Log.e("File", e.toString());
+        }*/
+        File file = new File(context.getFilesDir(), filename);
+
+        String fileContents = "111";
+        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
+            fos.write(fileContents.getBytes());//.toByteArray()
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*
+        FileInputStream fis = context.openFileInput(filename);
+        InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
+        StringBuilder stringBuilder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
+            String line = reader.readLine();
+            while (line != null) {
+                stringBuilder.append(line).append('\n');
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            Log.e("IOException","Error occurred when opening raw file for reading.");
+        } finally {
+            String contents = stringBuilder.toString();
+        }*/
+
+    }
+
+    public void File(){
+        String filename = "test.txt";
         try {
             // catches IOException below
             final String TESTSTRING = new String("Settings");
@@ -178,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
             osw.flush();
             osw.close();
 
-//Reading the file back...
+            //Reading the file back...
 
             /* We have to use the openFileInput()-method
              * the ActivityContext provides.
@@ -205,35 +253,20 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (IOException ioe)
         {ioe.printStackTrace();}
+    }
 
-        /*String fileContents = "Settings";
-        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
-            fos.write(Integer.parseInt(fileContents));//.toByteArray()
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        /*
-        FileInputStream fis = context.openFileInput(filename);
-        InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
-            String line = reader.readLine();
-            while (line != null) {
-                stringBuilder.append(line).append('\n');
-                line = reader.readLine();
-            }
-        } catch (IOException e) {
-            Log.e("IOException","Error occurred when opening raw file for reading.");
-        } finally {
-            String contents = stringBuilder.toString();
-        }*/
+    public void Drop_Down(){
 
-        Spinner dropdown = findViewById(R.id.Home_Tab);
-        String[] items = new String[]{"1", "2", "three"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        dropdown.setAdapter(adapter);
+        Spinner home_spin = findViewById(R.id.Home_Tab);
+        String[] items_home = new String[]{"Settings", "Map", "Test"};
+        ArrayAdapter<String> adapter_home = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items_home);
+        home_spin.setAdapter(adapter_home);
+
+        Spinner currency_spin = findViewById(R.id.Primary_Currency);
+        String[] items_currency = new String[]{"CZK", "EURO", "BTC"};
+        ArrayAdapter<String> adapter_currency = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items_currency);
+        currency_spin.setAdapter(adapter_currency);
+
     }
 
     public void Network(View view) {
@@ -307,8 +340,6 @@ public class MainActivity extends AppCompatActivity {
         ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
         ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
         ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
-
-        // connectionName
 
         switch(network_state) {
             case 1:
