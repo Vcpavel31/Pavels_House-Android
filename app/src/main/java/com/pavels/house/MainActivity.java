@@ -1,13 +1,19 @@
 package com.pavels.house;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.Formatter;
@@ -23,11 +29,18 @@ import android.net.NetworkInfo;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 
 // TODO:
 // Remove top panel
@@ -64,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
     public int WIFI_RSSI = 0;
     public String WIFI_IP = "0.0.0.0";
 
+    private static final String url = "jdbc:mysql://10.0.0.16:3306/Pavels House_v2";
+    private static final String user = "root";
+    private static final String pass = "Pavel31213";
+
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -79,16 +96,77 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+
+        Button btnFetch,btnClear;
+        TextView txtData;
+        txtData = (TextView) this.findViewById(R.id.txtData);
+        btnFetch = (Button) findViewById(R.id.btnFetch);
+        btnClear = (Button) findViewById(R.id.btnClear);
+        btnFetch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConnectMySql connectMySql = new ConnectMySql();
+                connectMySql.execute("");
+            }
+        });
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                txtData.setText("");
+            }
+        });
+
         Network_popup = new Dialog(this);
         WIFI_status = new Dialog(this);
         handler.postDelayed(runnable, 0);
 
         Drop_Down();
 
+    }
+
+
+    private class ConnectMySql extends AsyncTask<String, Void, String> {
+        String res = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(MainActivity.this, "Please wait...", Toast.LENGTH_SHORT).show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection con = DriverManager.getConnection(url, user, pass);
+                System.out.println("Databaseection success");
+
+                String result = "Database Connection Successful\n";
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery("SELECT * FROM `Devices`");
+                ResultSetMetaData rsmd = rs.getMetaData();
+
+                while (rs.next()) {
+                    result += rs.getString(1).toString() + "\n";
+                }
+                res = result;
+            } catch (Exception e) {
+                e.printStackTrace();
+                res = e.toString();
+            }
+            return res;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            TextView txtData = (TextView) findViewById(R.id.txtData);
+            txtData.setText(result);
+        }
     }
 
     private void GetWifiInfo(){
@@ -364,5 +442,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
 }
 
