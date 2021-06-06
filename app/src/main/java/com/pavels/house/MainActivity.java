@@ -22,6 +22,11 @@ import android.net.NetworkInfo;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Collections;
+import java.util.List;
+
 // TODO:
 // Remove top panel
 // How to make multiple screens ???
@@ -191,6 +196,21 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+    public static String getMobileIPAddress() {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        return  addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception ex) { } // for now eat exceptions
+        return "";
+    }
+
     public void Drop_Down(){
 
         Spinner home_spin = findViewById(R.id.Home_Tab);
@@ -211,60 +231,34 @@ public class MainActivity extends AppCompatActivity {
 
         Network_popup.setContentView(R.layout.networksatuspopup);
 
-        TextView ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
-        TextView ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
-        TextView connectionStrength =(TextView) Network_popup.findViewById(R.id.connectionStrength);
-        TextView connectionIP =(TextView) Network_popup.findViewById(R.id.connectionIP);
-        ImageView ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
+        TextView ConnectionType = (TextView) Network_popup.findViewById(R.id.connectionName);
+        TextView ConnectionName = (TextView) Network_popup.findViewById(R.id.ConnectionType);
+        TextView connectionStrength = (TextView) Network_popup.findViewById(R.id.connectionStrength);
+        TextView connectionIP = (TextView) Network_popup.findViewById(R.id.connectionIP);
+        ImageView ConnectionIcon = (ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
 
         if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 1) {
-            ConnectionName.setText("VPN connection");
-            ConnectionType.setText("Mobile Data");
-            connectionStrength.setText("");
-            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
             this.network_state = 2;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
-        }
-        else if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 2) {
-            ConnectionName.setText("VPN connection");
-            ConnectionType.setText(this.WIFI_SSID);
-            connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
+        } else if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 2) {
             this.network_state = 6;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
-        }
-        else if (isNetworkConnected() == 1) {
-            ConnectionName.setText("Mobile data");
-            ConnectionType.setText("");
-            connectionStrength.setText("");
-            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
+        } else if (isNetworkConnected() == 1) {
             this.network_state = 3;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
-        }
-        else if (checkWIFI() && SpaceIsConnected()) {
-            ConnectionName.setText("WIFI connection");
-            ConnectionType.setText(this.WIFI_SSID);
-            connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
+        } else if (checkWIFI() && SpaceIsConnected()) {
             this.network_state = 1;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
-        }
-        else if (O2IsConnected()) {
-            ConnectionName.setText("Unsecure");
-            ConnectionType.setText(this.WIFI_SSID);
-            connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
+        } else if (O2IsConnected()) {
             this.network_state = 4;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
-        }
-        else{
-            ConnectionName.setText("No connection");
-            ConnectionType.setText("");
-            connectionStrength.setText("");
-            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
+        } else {
             this.network_state = 5;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
         }
+
+        PopupNetwork(this.network_state);
+
     }
 //       Show current network status on popup page
     public void ShowNetwork(View view) {
@@ -273,59 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
         Network(findViewById(android.R.id.content).getRootView());
 
-        Network_popup.setContentView(R.layout.networksatuspopup);
-
-        TextView ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
-        TextView ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
-        TextView connectionStrength =(TextView) Network_popup.findViewById(R.id.connectionStrength);
-        TextView connectionIP =(TextView) Network_popup.findViewById(R.id.connectionIP);
-        ImageView ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
-
-        switch(this.network_state) {
-            case 1:
-                ConnectionName.setText("WIFI connection");
-                ConnectionType.setText(this.WIFI_SSID);
-                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-                connectionIP.setText(this.WIFI_IP);
-                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
-                break;
-            case 2:
-                ConnectionName.setText("VPN connection");
-                ConnectionType.setText("Mobile Data");
-                connectionStrength.setText("");
-                connectionIP.setText("1.1.1.1");
-                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
-                break;
-            case 3:
-                ConnectionName.setText("Mobile data");
-                ConnectionType.setText("");
-                connectionStrength.setText("");
-                connectionIP.setText("1.1.1.1");
-                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
-                break;
-            case 4:
-                ConnectionName.setText("Unsecure");
-                ConnectionType.setText(this.WIFI_SSID);
-                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-                connectionIP.setText(this.WIFI_IP);
-                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
-                break;
-            case 5:
-                ConnectionName.setText("No connection");
-                ConnectionType.setText("");
-                connectionStrength.setText("");
-                connectionIP.setText("1.1.1.1");
-                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
-                break;
-            case 6:
-                ConnectionName.setText("VPN connection");
-                ConnectionType.setText(this.WIFI_SSID);
-                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-                connectionIP.setText(this.WIFI_IP);
-                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
-                break;
-        }
-
+        PopupNetwork(this.network_state);
 
 //      For closing popup with close button
 /*
@@ -343,5 +285,66 @@ public class MainActivity extends AppCompatActivity {
         Network_popup.show();
     }
 
+    private void PopupNetwork(int current){
+        Network_popup.setContentView(R.layout.networksatuspopup);
+
+        TextView ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
+        TextView ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
+        TextView connectionStrength =(TextView) Network_popup.findViewById(R.id.connectionStrength);
+        TextView connectionIP =(TextView) Network_popup.findViewById(R.id.connectionIP);
+        ImageView ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
+
+        switch(current) {
+            case 1:
+                ConnectionName.setText("WIFI connection");
+                ConnectionType.setVisibility(View.VISIBLE);
+                connectionStrength.setVisibility(View.VISIBLE);
+                ConnectionType.setText("SSID: " + this.WIFI_SSID);
+                connectionStrength.setText(Integer.toString(this.WIFI_RSSI) + " dBm");
+                connectionIP.setText("IP: " + this.WIFI_IP);
+                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
+                break;
+            case 2:
+                ConnectionName.setText("VPN connection");
+                ConnectionType.setText("Mobile Data");
+                ConnectionType.setVisibility(View.VISIBLE);
+                connectionStrength.setVisibility(View.GONE);
+                connectionIP.setText("IP: " + getMobileIPAddress());
+                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
+                break;
+            case 3:
+                ConnectionName.setText("Mobile data");
+                ConnectionType.setVisibility(View.GONE);
+                connectionStrength.setVisibility(View.GONE);
+                connectionIP.setText("IP: " + getMobileIPAddress());
+                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
+                break;
+            case 4:
+                ConnectionName.setText("Unsecure");
+                ConnectionType.setVisibility(View.VISIBLE);
+                connectionStrength.setVisibility(View.VISIBLE);
+                ConnectionType.setText("SSID: " + this.WIFI_SSID);
+                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+                connectionIP.setText("IP: " + this.WIFI_IP);
+                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
+                break;
+            case 5:
+                ConnectionName.setText("No connection");
+                ConnectionType.setVisibility(View.GONE);
+                connectionStrength.setVisibility(View.GONE);
+                connectionIP.setText("IP: 0.0.0.0");
+                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
+                break;
+            case 6:
+                ConnectionName.setText("VPN connection");
+                ConnectionType.setVisibility(View.VISIBLE);
+                connectionStrength.setVisibility(View.VISIBLE);
+                ConnectionType.setText("SSID: " + this.WIFI_SSID);
+                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+                connectionIP.setText("IP: " + this.WIFI_IP);
+                ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
+                break;
+        }
+    }
 }
 

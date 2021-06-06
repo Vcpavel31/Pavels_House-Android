@@ -2,11 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="225dp"
-    android:layout_height="350dp"
-    android:padding="5dp"
+    android:layout_width="250dp"
+    android:layout_height="400dp"
     android:layout_gravity="center"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/txtclose"
@@ -48,7 +48,7 @@
 
     <TextView
         android:id="@+id/connectionName"
-        android:layout_width="106dp"
+        android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginTop="16dp"
         android:gravity="center"
@@ -61,7 +61,7 @@
 
     <TextView
         android:id="@+id/connectionStrength"
-        android:layout_width="106dp"
+        android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginTop="16dp"
         android:gravity="center"
@@ -74,7 +74,7 @@
 
     <TextView
         android:id="@+id/connectionIP"
-        android:layout_width="106dp"
+        android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginTop="16dp"
         android:gravity="center"
