@@ -15,10 +15,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -54,8 +56,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     Dialog Network_popup;
+    Dialog WIFI_status;
     private Handler handler = new Handler();
-    private Context context;
 
     public int network_state = 0;
     public String WIFI_SSID = "";
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         Network_popup = new Dialog(this);
+        WIFI_status = new Dialog(this);
         handler.postDelayed(runnable, 0);
 
         Drop_Down();
@@ -89,18 +92,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void GetWifiInfo(){
-        TextView tvWifiEnabled = (TextView)findViewById(R.id.tvWifiEnabled);
-        TextView tvWifiState = (TextView)findViewById(R.id.tvWifiState);
+
+        WIFI_status.setContentView(R.layout.wifistatuspopup);
+
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        TextView tvWifiEnabled = (TextView) WIFI_status.findViewById(R.id.tvWifiEnabled);
+        TextView tvWifiState = (TextView) WIFI_status.findViewById(R.id.tvWifiState);
+
         tvWifiEnabled.setText("isWifiEnabled(): " + wifiManager.isWifiEnabled());
         tvWifiState.setText(readtvWifiState(wifiManager));
 
-        TextView tvWifiInfo = (TextView)findViewById(R.id.tvWifiInfo);
-        TextView tvSSID = (TextView)findViewById(R.id.tvSSID);
-        TextView tvRssi = (TextView)findViewById(R.id.tvRssi);
-        TextView tvIP = (TextView)findViewById(R.id.tvIP);
-        TextView tvFormattedIP1 = (TextView)findViewById(R.id.tvFormattedIP1);
-        TextView tvFormattedIP2 = (TextView)findViewById(R.id.tvFormattedIP2);
+        TextView tvWifiInfo = (TextView) WIFI_status.findViewById(R.id.tvWifiInfo);
+        TextView tvSSID = (TextView) WIFI_status.findViewById(R.id.tvSSID);
+        TextView tvRssi = (TextView) WIFI_status.findViewById(R.id.tvRssi);
+        TextView tvIP = (TextView) WIFI_status.findViewById(R.id.tvIP);
+        TextView tvFormattedIP1 = (TextView) WIFI_status.findViewById(R.id.tvFormattedIP);
+
+
 
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         if(wifiInfo == null){
@@ -231,12 +240,6 @@ public class MainActivity extends AppCompatActivity {
 
         Network_popup.setContentView(R.layout.networksatuspopup);
 
-        TextView ConnectionType = (TextView) Network_popup.findViewById(R.id.connectionName);
-        TextView ConnectionName = (TextView) Network_popup.findViewById(R.id.ConnectionType);
-        TextView connectionStrength = (TextView) Network_popup.findViewById(R.id.connectionStrength);
-        TextView connectionIP = (TextView) Network_popup.findViewById(R.id.connectionIP);
-        ImageView ConnectionIcon = (ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
-
         if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 1) {
             this.network_state = 2;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
@@ -269,20 +272,35 @@ public class MainActivity extends AppCompatActivity {
 
         PopupNetwork(this.network_state);
 
-//      For closing popup with close button
-/*
-        TextView txtclose =(TextView) Network_popup.findViewById(R.id.txtclose);
-        txtclose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Popup", "Close Network");
-                Network_popup.dismiss();
-            }
-        });
-*/
-
         Network_popup.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         Network_popup.show();
+    }
+
+    public void ShowWIFIStatus(View view) {
+
+        Log.d("Popup", "Show WIFI Status");
+        WIFI_status.setContentView(R.layout.wifistatuspopup);
+
+        WIFI_status.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        WIFI_status.show();
+        GetWifiInfo();
+    }
+
+    public void Network_Info(View view){
+        Button txtclose =(Button) view.findViewById(R.id.Network_info);
+        ScrollView show =(ScrollView) Network_popup.findViewById(R.id.IconInfo);
+
+        Log.d("Button", txtclose.getText().toString());
+        if (txtclose.getText().toString() == "Show Info"){
+            txtclose.setText("Close Info");
+
+            show.setVisibility(View.VISIBLE);
+        }
+        else{
+            txtclose.setText("Show Info");
+
+            show.setVisibility(View.GONE);
+        }
     }
 
     private void PopupNetwork(int current){
