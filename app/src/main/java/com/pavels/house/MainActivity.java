@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -206,33 +207,64 @@ public class MainActivity extends AppCompatActivity {
 //       Show current network status on main page
     public void Network(View view) {
 
-        ImageView Connection_icon = (ImageView) findViewById(R.id.Connection_icon);
+        ImageView Connection_icon = (ImageView) this.findViewById(R.id.Connection_icon);
+
+        Network_popup.setContentView(R.layout.networksatuspopup);
+
+        TextView ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
+        TextView ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
+        TextView connectionStrength =(TextView) Network_popup.findViewById(R.id.connectionStrength);
+        TextView connectionIP =(TextView) Network_popup.findViewById(R.id.connectionIP);
+        ImageView ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
 
         if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 1) {
+            ConnectionName.setText("VPN connection");
+            ConnectionType.setText("Mobile Data");
+            connectionStrength.setText("");
+            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
             this.network_state = 2;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
         }
         else if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 2) {
+            ConnectionName.setText("VPN connection");
+            ConnectionType.setText(this.WIFI_SSID);
+            connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
             this.network_state = 6;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
         }
         else if (isNetworkConnected() == 1) {
+            ConnectionName.setText("Mobile data");
+            ConnectionType.setText("");
+            connectionStrength.setText("");
+            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
             this.network_state = 3;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
         }
         else if (checkWIFI() && SpaceIsConnected()) {
+            ConnectionName.setText("WIFI connection");
+            ConnectionType.setText(this.WIFI_SSID);
+            connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
             this.network_state = 1;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
         }
         else if (O2IsConnected()) {
+            ConnectionName.setText("Unsecure");
+            ConnectionType.setText(this.WIFI_SSID);
+            connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
             this.network_state = 4;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
         }
         else{
+            ConnectionName.setText("No connection");
+            ConnectionType.setText("");
+            connectionStrength.setText("");
+            ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
             this.network_state = 5;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
         }
-
     }
 //       Show current network status on popup page
     public void ShowNetwork(View view) {
@@ -246,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
         TextView ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
         TextView ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
         TextView connectionStrength =(TextView) Network_popup.findViewById(R.id.connectionStrength);
+        TextView connectionIP =(TextView) Network_popup.findViewById(R.id.connectionIP);
         ImageView ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
 
         switch(this.network_state) {
@@ -253,39 +286,46 @@ public class MainActivity extends AppCompatActivity {
                 ConnectionName.setText("WIFI connection");
                 ConnectionType.setText(this.WIFI_SSID);
                 connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+                connectionIP.setText(this.WIFI_IP);
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
                 break;
             case 2:
                 ConnectionName.setText("VPN connection");
                 ConnectionType.setText("Mobile Data");
                 connectionStrength.setText("");
+                connectionIP.setText("1.1.1.1");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
             case 3:
                 ConnectionName.setText("Mobile data");
                 ConnectionType.setText("");
                 connectionStrength.setText("");
+                connectionIP.setText("1.1.1.1");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
                 break;
             case 4:
                 ConnectionName.setText("Unsecure");
                 ConnectionType.setText(this.WIFI_SSID);
                 connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+                connectionIP.setText(this.WIFI_IP);
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
                 break;
             case 5:
                 ConnectionName.setText("No connection");
                 ConnectionType.setText("");
                 connectionStrength.setText("");
+                connectionIP.setText("1.1.1.1");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
                 break;
             case 6:
                 ConnectionName.setText("VPN connection");
                 ConnectionType.setText(this.WIFI_SSID);
                 connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
+                connectionIP.setText(this.WIFI_IP);
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
         }
+
 
 //      For closing popup with close button
 /*
