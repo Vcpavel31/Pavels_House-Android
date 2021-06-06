@@ -2,19 +2,15 @@ package com.pavels.house;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Application;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -24,17 +20,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-
-import java.nio.charset.StandardCharsets;
 
 // TODO:
 // Remove top panel
@@ -66,19 +51,23 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private Context context;
 
-    private int network_state = 0;
+    public int network_state = 0;
+    public String WIFI_SSID = "";
+    public int WIFI_RSSI = 0;
+    public String WIFI_IP = "0.0.0.0";
 
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            // The method you want to call every now and then.
+
             Network(findViewById(android.R.id.content).getRootView());
+            GetWifiInfo();
+
             Log.d("Handler", "Running");
-            handler.postDelayed(this,30000); // 2000 = 2 seconds. This time is in millis.
+            handler.postDelayed(this,5000); // 2000 = 2 seconds. This time is in millis.
+
         }
     };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,9 +78,47 @@ public class MainActivity extends AppCompatActivity {
         Network_popup = new Dialog(this);
         handler.postDelayed(runnable, 0);
 
-        TEST();
         Drop_Down();
 
+    }
+
+    private void GetWifiInfo(){
+        TextView tvWifiEnabled = (TextView)findViewById(R.id.tvWifiEnabled);
+        TextView tvWifiState = (TextView)findViewById(R.id.tvWifiState);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        tvWifiEnabled.setText("isWifiEnabled(): " + wifiManager.isWifiEnabled());
+        tvWifiState.setText(readtvWifiState(wifiManager));
+
+        TextView tvWifiInfo = (TextView)findViewById(R.id.tvWifiInfo);
+        TextView tvSSID = (TextView)findViewById(R.id.tvSSID);
+        TextView tvRssi = (TextView)findViewById(R.id.tvRssi);
+        TextView tvIP = (TextView)findViewById(R.id.tvIP);
+        TextView tvFormattedIP1 = (TextView)findViewById(R.id.tvFormattedIP1);
+        TextView tvFormattedIP2 = (TextView)findViewById(R.id.tvFormattedIP2);
+
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if(wifiInfo == null){
+            tvWifiInfo.setText("wifiInfo == null !!!");
+        }else{
+            tvWifiInfo.setText(wifiInfo.toString());
+            this.WIFI_SSID = wifiInfo.getSSID();
+            tvSSID.setText("SSID: " + wifiInfo.getSSID());
+            this.WIFI_RSSI = (int) wifiInfo.getRssi();
+            tvRssi.setText("Rssi: " + wifiInfo.getRssi() + " dBm");
+
+            int ipAddress = wifiInfo.getIpAddress();
+
+            String FormatedIpAddress2 = String.format("%d.%d.%d.%d",
+                    (ipAddress & 0xff),
+                    (ipAddress >> 8 & 0xff),
+                    (ipAddress >> 16 & 0xff),
+                    (ipAddress >> 24 & 0xff));
+
+            tvIP.setText("IP: " + wifiInfo.getIpAddress());
+
+            tvFormattedIP1.setText("" + FormatedIpAddress2);
+            this.WIFI_IP = FormatedIpAddress2;
+        }
     }
 
     private int isNetworkConnected() {
@@ -103,16 +130,7 @@ public class MainActivity extends AppCompatActivity {
             if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
                 return 2;
             } else
-                return 3;
-        }
-    }
-
-    public boolean internetIsConnected() {
-        try {
-            String command = "ping -c 1 google.com";
-            return (Runtime.getRuntime().exec(command).waitFor() == 0);
-        } catch (Exception e) {
-            return false;
+                return 0;
         }
     }
 
@@ -141,118 +159,35 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean checkWIFI() {
         if (isNetworkConnected() == 2){
-            /*
-            WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-            WifiInfo wifiInfo;
-            wifiInfo = wifiManager.getConnectionInfo();
-            */
-            //String ssid = "None";
-            /*if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
-                ssid = wifiInfo.getSSID();
-            }*/
 
-            //Log.d("SSID", wifiInfo.getSSID());
-            // Get connection's names if they are matching to home, test ping to space
+
+
             return true;
         }
         return false;
     }
 
-    public void TEST(){
-        Context context = getApplicationContext();
-        String filename = "test.txt";
-        //File.createNewFile(filename);
-        /*String FILENAME = "hello_file";
-        String string = "hello world!";
-
-        try {
-            FileOutputStream fos = openFileOutput(FILENAME, MODE_PRIVATE);
-            fos.write(string.getBytes());
-            fos.close();
+    private String readtvWifiState(WifiManager wm){
+        String result = "";
+        switch (wm.getWifiState()){
+            case WifiManager.WIFI_STATE_DISABLED:
+                result = "WIFI_STATE_DISABLED";
+                break;
+            case WifiManager.WIFI_STATE_DISABLING:
+                result = "WIFI_STATE_DISABLING";
+                break;
+            case WifiManager.WIFI_STATE_ENABLED:
+                result = "WIFI_STATE_ENABLED";
+                break;
+            case WifiManager.WIFI_STATE_ENABLING:
+                result = "WIFI_STATE_ENABLING";
+                break;
+            case WifiManager.WIFI_STATE_UNKNOWN:
+                result = "WIFI_STATE_UNKNOWN";
+                break;
+            default:
         }
-        catch (IOException e) {
-            Log.e("File", e.toString());
-        }*/
-        File file = new File(context.getFilesDir(), filename);
-
-        String fileContents = "111";
-        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
-            fos.write(fileContents.getBytes());//.toByteArray()
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        /*
-        FileInputStream fis = context.openFileInput(filename);
-        InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
-            String line = reader.readLine();
-            while (line != null) {
-                stringBuilder.append(line).append('\n');
-                line = reader.readLine();
-            }
-        } catch (IOException e) {
-            Log.e("IOException","Error occurred when opening raw file for reading.");
-        } finally {
-            String contents = stringBuilder.toString();
-        }*/
-
-    }
-
-    public void File(){
-        String filename = "test.txt";
-        try {
-            // catches IOException below
-            final String TESTSTRING = new String("Settings");
-
-            /* We have to use the openFileOutput()-method
-             * the ActivityContext provides, to
-             * protect your file from others and
-             * This is done for security-reasons.
-             * We chose MODE_WORLD_READABLE, because
-             *  we have nothing to hide in our file */
-            //MODE_PRIVATE
-            FileOutputStream fOut = openFileOutput(filename, MODE_PRIVATE);
-            OutputStreamWriter osw = new OutputStreamWriter(fOut);
-
-            // Write the string to the file
-            osw.write(TESTSTRING);
-
-            /* ensure that everything is
-             * really written out and close */
-            osw.flush();
-            osw.close();
-
-            //Reading the file back...
-
-            /* We have to use the openFileInput()-method
-             * the ActivityContext provides.
-             * Again for security reasons with
-             * openFileInput(...) */
-
-            FileInputStream fIn = openFileInput(filename);
-            InputStreamReader isr = new InputStreamReader(fIn);
-
-            /* Prepare a char-Array that will
-             * hold the chars we read back in. */
-            char[] inputBuffer = new char[TESTSTRING.length()];
-
-            // Fill the Buffer with data from the file
-            isr.read(inputBuffer);
-
-            // Transform the chars to a String
-            String readString = new String(inputBuffer);
-
-            // Check if we read back the same chars that we had written out
-            boolean isTheSame = TESTSTRING.equals(readString);
-
-            Log.i("File Reading stuff", "success = " + isTheSame);
-
-        } catch (IOException ioe)
-        {ioe.printStackTrace();}
+        return result;
     }
 
     public void Drop_Down(){
@@ -268,112 +203,93 @@ public class MainActivity extends AppCompatActivity {
         currency_spin.setAdapter(adapter_currency);
 
     }
-
+//       Show current network status on main page
     public void Network(View view) {
 
-        ImageView no_connection = (ImageView) findViewById(R.id.No_Connection);
-        ImageView unsecure = (ImageView) findViewById(R.id.Unsecure);
-        ImageView wifi = (ImageView) findViewById(R.id.WIFI);
-        ImageView vpn = (ImageView) findViewById(R.id.VPN);
-        ImageView mobile = (ImageView) findViewById(R.id.Mobile);
+        ImageView Connection_icon = (ImageView) findViewById(R.id.Connection_icon);
 
         if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 1) {
             this.network_state = 2;
-            vpn.setVisibility(View.VISIBLE);
-            unsecure.setVisibility(View.GONE);
-            wifi.setVisibility(View.GONE);
-            no_connection.setVisibility(View.GONE);
-            mobile.setVisibility(View.GONE);
+            Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
         }
         else if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 2) {
             this.network_state = 6;
-            vpn.setVisibility(View.VISIBLE);
-            unsecure.setVisibility(View.GONE);
-            wifi.setVisibility(View.GONE);
-            no_connection.setVisibility(View.GONE);
-            mobile.setVisibility(View.GONE);
-        }
-        else if (checkWIFI() && SpaceIsConnected()) {
-            this.network_state = 1;
-            wifi.setVisibility(View.VISIBLE);
-            vpn.setVisibility(View.GONE);
-            unsecure.setVisibility(View.GONE);
-            no_connection.setVisibility(View.GONE);
-            mobile.setVisibility(View.GONE);
+            Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
         }
         else if (isNetworkConnected() == 1) {
             this.network_state = 3;
-            wifi.setVisibility(View.GONE);
-            vpn.setVisibility(View.GONE);
-            unsecure.setVisibility(View.GONE);
-            no_connection.setVisibility(View.GONE);
-            mobile.setVisibility(View.VISIBLE);
+            Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
+        }
+        else if (checkWIFI() && SpaceIsConnected()) {
+            this.network_state = 1;
+            Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
         }
         else if (O2IsConnected()) {
             this.network_state = 4;
-            wifi.setVisibility(View.GONE);
-            vpn.setVisibility(View.GONE);
-            unsecure.setVisibility(View.VISIBLE);
-            no_connection.setVisibility(View.GONE);
-            mobile.setVisibility(View.GONE);
+            Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
         }
         else{
             this.network_state = 5;
-            wifi.setVisibility(View.GONE);
-            vpn.setVisibility(View.GONE);
-            unsecure.setVisibility(View.GONE);
-            no_connection.setVisibility(View.VISIBLE);
-            mobile.setVisibility(View.GONE);
+            Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
         }
 
     }
-
+//       Show current network status on popup page
     public void ShowNetwork(View view) {
-        Log.d("Popup", "Show Network");
-        Network(findViewById(android.R.id.content).getRootView());
-        TextView txtclose;
-        TextView ConnectionName;
-        TextView ConnectionType;
-        ImageView ConnectionIcon;
-        Network_popup.setContentView(R.layout.networksatuspopup);
-        txtclose =(TextView) Network_popup.findViewById(R.id.txtclose);
-        ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
-        ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
-        ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
 
-        switch(network_state) {
+        Log.d("Popup", "Show Network");
+
+        Network(findViewById(android.R.id.content).getRootView());
+
+        Network_popup.setContentView(R.layout.networksatuspopup);
+
+        TextView ConnectionType =(TextView) Network_popup.findViewById(R.id.connectionName);
+        TextView ConnectionName =(TextView) Network_popup.findViewById(R.id.ConnectionType);
+        TextView connectionStrength =(TextView) Network_popup.findViewById(R.id.connectionStrength);
+        ImageView ConnectionIcon =(ImageView) Network_popup.findViewById(R.id.ConnectionIcon);
+
+        switch(this.network_state) {
             case 1:
                 ConnectionName.setText("WIFI connection");
-                ConnectionType.setText("WIFI Name");
+                ConnectionType.setText(this.WIFI_SSID);
+                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
                 break;
             case 2:
                 ConnectionName.setText("VPN connection");
                 ConnectionType.setText("Mobile Data");
+                connectionStrength.setText("");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
             case 3:
                 ConnectionName.setText("Mobile data");
                 ConnectionType.setText("");
+                connectionStrength.setText("");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
                 break;
             case 4:
                 ConnectionName.setText("Unsecure");
-                ConnectionType.setText("WIFI Name");
+                ConnectionType.setText(this.WIFI_SSID);
+                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
                 break;
             case 5:
                 ConnectionName.setText("No connection");
                 ConnectionType.setText("");
+                connectionStrength.setText("");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
                 break;
             case 6:
                 ConnectionName.setText("VPN connection");
-                ConnectionType.setText("WIFI Name");
+                ConnectionType.setText(this.WIFI_SSID);
+                connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
         }
 
+//      For closing popup with close button
+/*
+        TextView txtclose =(TextView) Network_popup.findViewById(R.id.txtclose);
         txtclose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -381,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
                 Network_popup.dismiss();
             }
         });
+*/
 
         Network_popup.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         Network_popup.show();
