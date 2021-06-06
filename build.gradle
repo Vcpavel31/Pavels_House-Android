@@ -3,7 +3,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://mvnrepository.com/artifact/mysql/mysql-connector-java' }
+        //maven { url 'https://mvnrepository.com/artifact/mysql/mysql-connector-java' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'

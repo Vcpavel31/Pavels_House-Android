@@ -1,24 +1,17 @@
 package com.pavels.house;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.format.Formatter;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -33,14 +26,10 @@ import android.widget.Toast;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 
 // TODO:
 // Remove top panel
@@ -57,14 +46,7 @@ import java.sql.Statement;
 // 7) Task manager - showing HDO; Printer task; ...
 // 8) Password manager - Probably use OpenSource -> KeePass it has clients for Linux; WIN; PHP; Android
 
-// 1) WIFI SSID:
-// Get WIFI SSID
-// Compare SSID
-
-// 2) User settings
-// Default screen
-// Default Currency
-// File Accessing
+@SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables", "DefaultLocale"})
 
 public class MainActivity extends AppCompatActivity {
 
@@ -100,73 +82,14 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-
-        Button btnFetch,btnClear;
-        TextView txtData;
-        txtData = (TextView) this.findViewById(R.id.txtData);
-        btnFetch = (Button) findViewById(R.id.btnFetch);
-        btnClear = (Button) findViewById(R.id.btnClear);
-        btnFetch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ConnectMySql connectMySql = new ConnectMySql();
-                connectMySql.execute("");
-            }
-        });
-        btnClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                txtData.setText("");
-            }
-        });
-
         Network_popup = new Dialog(this);
         WIFI_status = new Dialog(this);
         handler.postDelayed(runnable, 0);
 
         Drop_Down();
+        Network(findViewById(android.R.id.content).getRootView());
+        GetWifiInfo();
 
-    }
-
-
-    private class ConnectMySql extends AsyncTask<String, Void, String> {
-        String res = "";
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Toast.makeText(MainActivity.this, "Please wait...", Toast.LENGTH_SHORT).show();
-
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection con = DriverManager.getConnection(url, user, pass);
-                System.out.println("Databaseection success");
-
-                String result = "Database Connection Successful\n";
-                Statement st = con.createStatement();
-                ResultSet rs = st.executeQuery("SELECT * FROM `Devices`");
-                ResultSetMetaData rsmd = rs.getMetaData();
-
-                while (rs.next()) {
-                    result += rs.getString(1).toString() + "\n";
-                }
-                res = result;
-            } catch (Exception e) {
-                e.printStackTrace();
-                res = e.toString();
-            }
-            return res;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            TextView txtData = (TextView) findViewById(R.id.txtData);
-            txtData.setText(result);
-        }
     }
 
     private void GetWifiInfo(){
@@ -187,31 +110,33 @@ public class MainActivity extends AppCompatActivity {
         TextView tvIP = (TextView) WIFI_status.findViewById(R.id.tvIP);
         TextView tvFormattedIP1 = (TextView) WIFI_status.findViewById(R.id.tvFormattedIP);
 
-
-
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         if(wifiInfo == null){
             tvWifiInfo.setText("wifiInfo == null !!!");
         }else{
             tvWifiInfo.setText(wifiInfo.toString());
-            this.WIFI_SSID = wifiInfo.getSSID();
+            this.WIFI_SSID = wifiInfo.getSSID().substring(1, wifiInfo.getSSID().length() - 1);
             tvSSID.setText("SSID: " + wifiInfo.getSSID());
             this.WIFI_RSSI = (int) wifiInfo.getRssi();
             tvRssi.setText("Rssi: " + wifiInfo.getRssi() + " dBm");
 
             int ipAddress = wifiInfo.getIpAddress();
 
-            String FormatedIpAddress2 = String.format("%d.%d.%d.%d",
-                    (ipAddress & 0xff),
-                    (ipAddress >> 8 & 0xff),
-                    (ipAddress >> 16 & 0xff),
-                    (ipAddress >> 24 & 0xff));
+            String FormatedIpAddress2 = String.format("%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
 
             tvIP.setText("IP: " + wifiInfo.getIpAddress());
 
             tvFormattedIP1.setText("" + FormatedIpAddress2);
             this.WIFI_IP = FormatedIpAddress2;
         }
+    }
+//TODO - get from file
+    public String[] GetHomeSSID(){
+        return new String[]{"Kubisci", "Kubisci_Antena"};
+    }
+//TODO - append to file
+    public void AddSSID(View view){
+        Toast.makeText(MainActivity.this, "Addind SSID: "+this.WIFI_SSID, Toast.LENGTH_SHORT) .show();
     }
 
     private int isNetworkConnected() {
@@ -252,10 +177,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean checkWIFI() {
         if (isNetworkConnected() == 2){
-
-
-
-            return true;
+            List<String> WIFIList = new ArrayList<>(Arrays.asList(GetHomeSSID()));
+            return WIFIList.contains(this.WIFI_SSID);
         }
         return false;
     }
@@ -294,19 +217,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        } catch (Exception ex) { } // for now eat exceptions
+        }
+        catch (Exception ex) {
+            Log.e("Error","getMobileIPAddress");
+        }
         return "";
     }
 
     public void Drop_Down(){
 
         Spinner home_spin = findViewById(R.id.Home_Tab);
-        String[] items_home = new String[]{"Settings", "Map", "Test"};
+        String[] items_home = new String[]{"Nastavení", "Mapa", "Test"};
         ArrayAdapter<String> adapter_home = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items_home);
         home_spin.setAdapter(adapter_home);
 
         Spinner currency_spin = findViewById(R.id.Primary_Currency);
-        String[] items_currency = new String[]{"CZK", "EURO", "BTC"};
+        String[] items_currency = new String[]{"Kč", "Euro", "BTC"};
         ArrayAdapter<String> adapter_currency = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items_currency);
         currency_spin.setAdapter(adapter_currency);
 
@@ -315,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
     public void Network(View view) {
 
         ImageView Connection_icon = (ImageView) this.findViewById(R.id.Connection_icon);
+        Button AddSSID = (Button) this.findViewById(R.id.SSID);
 
         Network_popup.setContentView(R.layout.networksatuspopup);
 
@@ -337,6 +264,8 @@ public class MainActivity extends AppCompatActivity {
             this.network_state = 5;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
         }
+
+        AddSSID.setText(this.WIFI_SSID);
 
         PopupNetwork(this.network_state);
 
@@ -365,18 +294,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Network_Info(View view){
-        Button txtclose =(Button) view.findViewById(R.id.Network_info);
+        Button close =(Button) view.findViewById(R.id.Network_info);
         ScrollView show =(ScrollView) Network_popup.findViewById(R.id.IconInfo);
 
-        Log.d("Button", txtclose.getText().toString());
-        if (txtclose.getText().toString() == "Show Info"){
-            txtclose.setText("Close Info");
-
+        Log.d("Button", close.getText().toString());
+        if (close.getText().toString().equals("Show Info")){
+            close.setText("Close Info");
             show.setVisibility(View.VISIBLE);
         }
         else{
-            txtclose.setText("Show Info");
-
+            close.setText("Show Info");
             show.setVisibility(View.GONE);
         }
     }
@@ -392,52 +319,52 @@ public class MainActivity extends AppCompatActivity {
 
         switch(current) {
             case 1:
-                ConnectionName.setText("WIFI connection");
+                ConnectionName.setText("Domácí WIFI");
                 ConnectionType.setVisibility(View.VISIBLE);
                 connectionStrength.setVisibility(View.VISIBLE);
                 ConnectionType.setText("SSID: " + this.WIFI_SSID);
                 connectionStrength.setText(Integer.toString(this.WIFI_RSSI) + " dBm");
-                connectionIP.setText("IP: " + this.WIFI_IP);
+                connectionIP.setText("IP adresa: " + this.WIFI_IP);
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
                 break;
             case 2:
-                ConnectionName.setText("VPN connection");
-                ConnectionType.setText("Mobile Data");
+                ConnectionName.setText("VPN připojení");
+                ConnectionType.setText("Mobilní data");
                 ConnectionType.setVisibility(View.VISIBLE);
                 connectionStrength.setVisibility(View.GONE);
-                connectionIP.setText("IP: " + getMobileIPAddress());
+                connectionIP.setText("IP adresa: " + getMobileIPAddress());
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
             case 3:
-                ConnectionName.setText("Mobile data");
+                ConnectionName.setText("Mobilní data");
                 ConnectionType.setVisibility(View.GONE);
                 connectionStrength.setVisibility(View.GONE);
-                connectionIP.setText("IP: " + getMobileIPAddress());
+                connectionIP.setText("IP adresa: " + getMobileIPAddress());
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
                 break;
             case 4:
-                ConnectionName.setText("Unsecure");
+                ConnectionName.setText("Nezabezpečená síť");
                 ConnectionType.setVisibility(View.VISIBLE);
                 connectionStrength.setVisibility(View.VISIBLE);
                 ConnectionType.setText("SSID: " + this.WIFI_SSID);
                 connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-                connectionIP.setText("IP: " + this.WIFI_IP);
+                connectionIP.setText("IP adresa: " + this.WIFI_IP);
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_cloud_24));
                 break;
             case 5:
-                ConnectionName.setText("No connection");
+                ConnectionName.setText("Žádné připojení");
                 ConnectionType.setVisibility(View.GONE);
                 connectionStrength.setVisibility(View.GONE);
-                connectionIP.setText("IP: 0.0.0.0");
+                connectionIP.setText("IP adresa: 0.0.0.0");
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
                 break;
             case 6:
-                ConnectionName.setText("VPN connection");
+                ConnectionName.setText("VPN připojení");
                 ConnectionType.setVisibility(View.VISIBLE);
                 connectionStrength.setVisibility(View.VISIBLE);
                 ConnectionType.setText("SSID: " + this.WIFI_SSID);
                 connectionStrength.setText(Integer.toString(this.WIFI_RSSI)+ " dBm");
-                connectionIP.setText("IP: " + this.WIFI_IP);
+                connectionIP.setText("IP adresa: " + this.WIFI_IP);
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
         }
