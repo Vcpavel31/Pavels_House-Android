@@ -24,12 +24,21 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // TODO:
 // Remove top panel
@@ -52,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     Dialog Network_popup;
     Dialog WIFI_status;
+    Dialog Home_WIFI_list;
     private Handler handler = new Handler();
 
     public int network_state = 0;
@@ -83,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Network_popup = new Dialog(this);
+        Home_WIFI_list = new Dialog(this);
         WIFI_status = new Dialog(this);
         handler.postDelayed(runnable, 0);
 
@@ -132,11 +143,82 @@ public class MainActivity extends AppCompatActivity {
     }
 //TODO - get from file
     public String[] GetHomeSSID(){
-        return new String[]{"Kubisci", "Kubisci_Antena"};
+
+        String SSID_Home;
+        SSID_Home = readFromFile("SSID_Home.txt", this);
+        Log.d("SSID", SSID_Home);
+        String[] SSID = SSID_Home.replace("[", "").replace("]", "").split(",");
+        Log.d("SSID v souboru", Arrays.toString(Arrays.copyOfRange(SSID, 1, SSID.length)));
+        int i;
+        String[] mezi = Arrays.copyOfRange(SSID, 1, SSID.length);
+        List<String> mezi_for = new ArrayList<String>();
+        for (i = 0; i < mezi.length; i++) {
+            mezi_for.add(mezi[i]);
+        }
+        String[] done = new String[ mezi_for.size() ];
+        mezi_for.toArray( done );
+
+        return done;
+
+        //new String[]{"Kubisci", "Kubisci_Antena"};
+
     }
+
+    private String readFromFile(String name, Context context) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(name);
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString); //.append("\n")
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+
 //TODO - append to file
     public void AddSSID(View view){
-        Toast.makeText(MainActivity.this, "Addind SSID: "+this.WIFI_SSID, Toast.LENGTH_SHORT) .show();
+        Toast.makeText(MainActivity.this, "Přidávání SSID: "+this.WIFI_SSID, Toast.LENGTH_SHORT) .show();
+
+        String previous = Arrays.stream((readFromFile("SSID_Home.txt", this).replace("[", "").replace("]", "") + "," + this.WIFI_SSID).split(",")).distinct().collect(Collectors.joining(","));
+
+        //String[] modifiedArray = Arrays.copyOfRange(previous, 1, previous.length);
+
+        Log.d("Adding SSID", previous);
+        writeToFile("SSID_Home.txt", previous, this);
+    }
+
+    private void writeToFile(String name, String data, Context context) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(name, Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    public void Clean_Home_SSID(View view) {
+        writeToFile("SSID_Home.txt", "",this);
     }
 
     private int isNetworkConnected() {
@@ -241,20 +323,19 @@ public class MainActivity extends AppCompatActivity {
     public void Network(View view) {
 
         ImageView Connection_icon = (ImageView) this.findViewById(R.id.Connection_icon);
-        Button AddSSID = (Button) this.findViewById(R.id.SSID);
 
         Network_popup.setContentView(R.layout.networksatuspopup);
 
-        if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 1) {
+        if (checkVPN() && isNetworkConnected() == 1) { // && SpaceIsConnected()
             this.network_state = 2;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
-        } else if (checkVPN() && SpaceIsConnected() && isNetworkConnected() == 2) {
+        } else if (checkVPN() && isNetworkConnected() == 2) { // && SpaceIsConnected()
             this.network_state = 6;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
         } else if (isNetworkConnected() == 1) {
             this.network_state = 3;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_import_export_24));
-        } else if (checkWIFI() && SpaceIsConnected()) {
+        } else if (checkWIFI()) { // && SpaceIsConnected()
             this.network_state = 1;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_wifi_24));
         } else if (O2IsConnected()) {
@@ -264,8 +345,6 @@ public class MainActivity extends AppCompatActivity {
             this.network_state = 5;
             Connection_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_close_24));
         }
-
-        AddSSID.setText(this.WIFI_SSID);
 
         PopupNetwork(this.network_state);
 
@@ -368,6 +447,14 @@ public class MainActivity extends AppCompatActivity {
                 ConnectionIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_vpn_lock_24));
                 break;
         }
+    }
+
+    public void ShowWIFIlist(View view){
+
+        Home_WIFI_list.setContentView(R.layout.homewifilist);
+        Home_WIFI_list.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        Home_WIFI_list.show();
+
     }
 
 }
