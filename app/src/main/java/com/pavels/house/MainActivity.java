@@ -1,6 +1,7 @@
 package com.pavels.house;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -454,6 +455,8 @@ public class MainActivity extends AppCompatActivity {
         Home_WIFI_list.setContentView(R.layout.homewifilist);
         Home_WIFI_list.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         Home_WIFI_list.show();
+
+
 
     }
 
