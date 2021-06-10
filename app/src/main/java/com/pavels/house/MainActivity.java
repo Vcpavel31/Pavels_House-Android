@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiInfo;
@@ -450,13 +451,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // TODO
     public void ShowWIFIlist(View view){
 
         Home_WIFI_list.setContentView(R.layout.homewifilist);
         Home_WIFI_list.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         Home_WIFI_list.show();
 
+    }
 
+    public void ShowMap(View view){
+
+        Intent myIntent = new Intent(view.getContext(), MapsActivity.class);
+        startActivityForResult(myIntent, 0);
 
     }
 
