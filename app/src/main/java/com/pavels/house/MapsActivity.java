@@ -15,9 +15,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.pavels.house.databinding.ActivityMapsBinding;
 
-public class MapsActivity extends AppCompatActivity {//implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    //private GoogleMap mMap;
+    private GoogleMap mMap;
     //private ActivityMapsBinding binding;
 
     @Override
@@ -30,8 +30,8 @@ public class MapsActivity extends AppCompatActivity {//implements OnMapReadyCall
         setContentView(R.layout.activity_maps);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        //mapFragment.getMapAsync(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     /**
@@ -43,7 +43,7 @@ public class MapsActivity extends AppCompatActivity {//implements OnMapReadyCall
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    /*
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -53,7 +53,7 @@ public class MapsActivity extends AppCompatActivity {//implements OnMapReadyCall
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
-*/
+
     public void ShowMain(View view){
 
         Intent myIntent = new Intent(view.getContext(), MainActivity.class);
