@@ -3,6 +3,7 @@ package com.pavels.house;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
@@ -12,10 +13,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.pavels.house.databinding.ActivityMapsBinding;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     //private ActivityMapsBinding binding;
@@ -49,11 +51,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
+
+        // 49.0411547N, 16.3078331E
+        // 49°2'28.207"N, 16°18'28.373"E
+
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(49.0411547, 16.3078331)).title("Leikep\nMoravský krumlov\nBřezová211")).setTag(0);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(49.7437506, 15.3386478), 6.0f));
+        mMap.setOnMarkerClickListener(this);
     }
 
+    /** Called when the user clicks a marker. */
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+
+        // Retrieve the data from the marker.
+        Integer clickCount = (Integer) marker.getTag();
+
+        // Check if a click count was set, then display the click count.
+        if (clickCount != null) {
+            clickCount = clickCount + 1;
+            marker.setTag(clickCount);
+            Toast.makeText(this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+            /*+" has been clicked " + clickCount + " times."*/
+        }
+        //else Toast.makeText(this, "WHAT THE HELL? :D", Toast.LENGTH_LONG).show();
+
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur (which is for the camera to move such that the
+        // marker is centered and for the marker's info window to open, if it has one).
+        return false;
+    }
     public void ShowMain(View view){
 
         Intent myIntent = new Intent(view.getContext(), MainActivity.class);
