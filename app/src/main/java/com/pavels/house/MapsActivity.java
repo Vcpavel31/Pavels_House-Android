@@ -2,6 +2,7 @@ package com.pavels.house;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.pavels.house.databinding.ActivityMapsBinding;
+
+import java.util.Arrays;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -55,9 +58,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // 49.0411547N, 16.3078331E
         // 49°2'28.207"N, 16°18'28.373"E
 
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(49.0411547, 16.3078331)).title("Leikep\nMoravský krumlov\nBřezová211")).setTag(0);
+        double[][] souradnice = {
+                {43, 49, 2, 28.29, 16, 18, 28.205}, {18, 49, 2, 52.85, 15, 49, 0.012}, {34, 49, 4, 4.218, 16, 6, 49.625}, {19, 49, 5, 47.794, 16, 15, 22.484}, {20, 49, 6, 48.566, 15, 37, 5.577}, {14, 49, 7, 34.438, 15, 58, 57.029}, {23, 49, 8, 44.539, 15, 50, 36.483}, {41, 49, 8, 45.966, 15, 52, 49.475}, {15, 49, 12, 11.548, 16, 3, 53.246}, {28, 49, 12, 24.439, 15, 52, 55.94}, {24, 49, 12, 27.917, 15, 51, 26.672}, {32, 49, 12, 30.869, 15, 53, 27.611}, {31, 49, 12, 35.303, 15, 52, 52.261}, {30, 49, 12, 38.803, 15, 53, 13.103}, {11, 49, 12, 57.446, 15, 53, 22.224}, {36, 49, 12, 59.758, 15, 53, 50.721}, {12, 49, 13, 3.268, 15, 52, 33.777}, {26, 49, 13, 9.079, 15, 53, 52.238}, {27, 49, 13, 14.698, 15, 52, 54.344}, {5, 49, 13, 18.501, 15, 43, 45.319}, {29, 49, 13, 22.285, 15, 53, 24.705}, {35, 49, 13, 29.539, 15, 51, 58.924}, {33, 49, 13, 34.779, 16, 0, 5.417}, {10, 49, 13, 35.055, 15, 52, 10.204}, {6, 49, 13, 43.879, 15, 43, 57.975}, {42, 49, 15, 28.969, 15, 55, 15.923}, {7, 49, 15, 50.543, 16, 5, 33.576}, {8, 49, 15, 59.717, 16, 5, 41.591}, {22, 49, 16, 12.087, 16, 1, 44.178}, {39, 49, 16, 23.595, 16, 1, 37.836}, {9, 49, 16, 25.851, 16, 3, 48.549}, {40, 49, 17, 8.673, 16, 1, 11.61}, {3, 49, 17, 26.589, 16, 2, 1.561}, {4, 49, 18, 11.552, 15, 57, 1.48}, {17, 49, 18, 16.523, 16, 33, 29.236}, {25, 49, 20, 10.118, 15, 57, 23.147}, {38, 49, 21, 13.911, 16, 4, 28.978}, {13, 49, 21, 20.527, 15, 59, 55.755}, {37, 49, 21, 22.844, 15, 59, 41.241}, {21, 49, 27, 2.814, 16, 31, 40.246}, {2, 50, 13, 50.065, 15, 44, 42.75}
+                };
+
+        String[] nazvy = new String[souradnice.length];
+        Arrays.fill(nazvy, "TEST");
+        nazvy[0] = "IDK";
+        for (int i = 0; i < souradnice.length; ++i) {
+            double N = souradnice[i][1]+souradnice[i][2]/60+souradnice[i][3]/3600;
+            Log.d("N-souradnice", String.valueOf(N));
+            double E = souradnice[i][4]+souradnice[i][5]/60+souradnice[i][6]/3600;
+            Log.d("E-souradnice", String.valueOf(E));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(N,E)));//.title(nazvy[i])).setTag(souradnice[i][0]);
+        }
+
+        //LatLng sydney = new LatLng(-34, 151);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(49.0411547, 16.3078331)).title("Leikep\nMoravský krumlov\nBřezová211")).setTag(0);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(49.7437506, 15.3386478), 6.0f));
         mMap.setOnMarkerClickListener(this);
     }
