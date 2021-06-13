@@ -71,10 +71,6 @@ public class MainActivity extends AppCompatActivity {
     public int WIFI_RSSI = 0;
     public String WIFI_IP = "0.0.0.0";
 
-    private static final String url = "jdbc:mysql://10.0.0.16:3306/Pavels House_v2";
-    private static final String user = "root";
-    private static final String pass = "Pavel31213";
-
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -87,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    private static final String url = "jdbc:mysql://10.0.0.16:3306/Pavels House_v2";
+    private static final String user = "root";
+    private static final String pass = "Pavel31213";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void GetWifiInfo(){
+    public void GetWifiInfo(){
 
         WIFI_status.setContentView(R.layout.wifistatuspopup);
 
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         TextView tvWifiState = (TextView) WIFI_status.findViewById(R.id.tvWifiState);
 
         tvWifiEnabled.setText("isWifiEnabled(): " + wifiManager.isWifiEnabled());
-        tvWifiState.setText(readtvWifiState(wifiManager));
+        tvWifiState.setText(MainActivity.readtvWifiState(wifiManager));
 
         TextView tvWifiInfo = (TextView) WIFI_status.findViewById(R.id.tvWifiInfo);
         TextView tvSSID = (TextView) WIFI_status.findViewById(R.id.tvSSID);
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private String readtvWifiState(WifiManager wm){
+    private static String readtvWifiState(WifiManager wm){
         String result = "";
         switch (wm.getWifiState()){
             case WifiManager.WIFI_STATE_DISABLED:
