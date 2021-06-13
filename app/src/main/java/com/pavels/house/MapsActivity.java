@@ -22,7 +22,7 @@ import com.pavels.house.databinding.ActivityMapsBinding;
 
 import java.util.Arrays;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends MainActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     //private ActivityMapsBinding binding;
@@ -76,7 +76,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             float color = Float.parseFloat(DB[1]);
             mMap.addMarker( new MarkerOptions()
                             .position(new LatLng(N, E))
-                            .icon(BitmapDescriptorFactory.defaultMarker(color))
+                            //.icon(BitmapDescriptorFactory.defaultMarker(color))
                             .title(title) ).setTag(ID);
         }
 

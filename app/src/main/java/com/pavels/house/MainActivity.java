@@ -1,16 +1,24 @@
 package com.pavels.house;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -64,9 +72,11 @@ public class MainActivity extends AppCompatActivity {
     Dialog Network_popup;
     Dialog WIFI_status;
     Dialog Home_WIFI_list;
+
     private Handler handler = new Handler();
 
     public int network_state = 0;
+
     public String WIFI_SSID = "";
     public int WIFI_RSSI = 0;
     public String WIFI_IP = "0.0.0.0";
@@ -74,11 +84,11 @@ public class MainActivity extends AppCompatActivity {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            Log.d("Handler", "Running");
 
             Network(findViewById(android.R.id.content).getRootView());
             GetWifiInfo();
 
-            Log.d("Handler", "Running");
             handler.postDelayed(this,5000); // 2000 = 2 seconds. This time is in millis.
 
         }
@@ -92,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        TestPermissions();
+
         setContentView(R.layout.activity_main);
 
         Network_popup = new Dialog(this);
@@ -102,6 +114,101 @@ public class MainActivity extends AppCompatActivity {
         Drop_Down();
         Network(findViewById(android.R.id.content).getRootView());
         GetWifiInfo();
+
+    }
+
+    public void TestPermissions(){
+        String Permission;
+
+        Permission = Manifest.permission.ACCESS_FINE_LOCATION;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.ACCESS_NETWORK_STATE;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.INTERNET;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.ACCESS_WIFI_STATE;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.ACCESS_NETWORK_STATE;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.ACCESS_COARSE_LOCATION;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.MANAGE_EXTERNAL_STORAGE;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
+
+        Permission = Manifest.permission.READ_PHONE_STATE;
+        if(ContextCompat.checkSelfPermission(this, Permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", Permission+" Granted");
+        }
+        else{
+            Log.d("Permission", Permission+" Error");
+            requestPermissions(new String[] { Permission }, 1);
+        }
 
     }
 
@@ -307,7 +414,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return "";
     }
-
+// TODO Move to settings
     public void Drop_Down(){
 
         Spinner home_spin = findViewById(R.id.Home_Tab);
@@ -463,6 +570,13 @@ public class MainActivity extends AppCompatActivity {
     public void ShowMap(View view){
 
         Intent myIntent = new Intent(view.getContext(), MapsActivity.class);
+        startActivityForResult(myIntent, 0);
+
+    }
+
+    public void ShowSettings(View view){
+
+        Intent myIntent = new Intent(view.getContext(), SettingsActivity.class);
         startActivityForResult(myIntent, 0);
 
     }
